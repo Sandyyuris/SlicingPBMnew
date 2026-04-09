@@ -21,8 +21,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ShopeeHomePage extends StatelessWidget {
+class ShopeeHomePage extends StatefulWidget {
   const ShopeeHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<ShopeeHomePage> createState() => _ShopeeHomePageState();
+}
+
+class _ShopeeHomePageState extends State<ShopeeHomePage> {
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,16 +41,37 @@ class ShopeeHomePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(
-              height: 16,
-            ),
-            _buildBannerSection(),
             const SizedBox(height: 16),
+            _buildBannerSection(),
+            Transform.translate(
+              offset: const Offset(0, -10),
+              child: _buildWalletSection(),
+            ),
             _buildMenuSection(),
             const SizedBox(height: 8),
             _buildProductGrid(),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFFEE4D2D),
+        unselectedItemColor: Colors.grey,
+        selectedFontSize: 10,
+        unselectedFontSize: 10,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.thumb_up_alt_outlined), activeIcon: Icon(Icons.thumb_up), label: 'Rekomendasi'),
+          BottomNavigationBarItem(icon: Icon(Icons.storefront_outlined), activeIcon: Icon(Icons.storefront), label: 'Mall'),
+          BottomNavigationBarItem(icon: Icon(Icons.play_circle_outline), activeIcon: Icon(Icons.play_circle_fill), label: 'Video'),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications_none), activeIcon: Icon(Icons.notifications), label: 'Notifikasi'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Saya'),
+        ],
       ),
     );
   }
@@ -63,9 +91,10 @@ class ShopeeHomePage extends StatelessWidget {
               ),
               child: const TextField(
                 decoration: InputDecoration(
-                  hintText: 'Cari barang di Shopee...',
+                  hintText: 'Cari barang...',
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  suffixIcon: Icon(Icons.camera_alt_outlined, color: Colors.grey),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 9),
                 ),
@@ -82,68 +111,69 @@ class ShopeeHomePage extends StatelessWidget {
   }
 
   Widget _buildBannerSection() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 180,
       child: Image.asset('assets/images/promo.jpg', fit: BoxFit.cover),
     );
   }
 
+  Widget _buildWalletSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildWalletItem(Icons.qr_code_scanner, 'Scan'),
+          Container(height: 30, width: 1, color: Colors.grey[300]),
+          _buildWalletItem(Icons.account_balance_wallet, 'Rp150.000'),
+          Container(height: 30, width: 1, color: Colors.grey[300]),
+          _buildWalletItem(Icons.monetization_on, '1.500 Koin'),
+          Container(height: 30, width: 1, color: Colors.grey[300]),
+          _buildWalletItem(Icons.send_to_mobile, 'Transfer'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWalletItem(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, size: 20, color: const Color(0xFFEE4D2D)),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500)),
+      ],
+    );
+  }
+
   Widget _buildMenuSection() {
     final List<Map<String, dynamic>> menus = [
-      {
-        'title': 'Gratis Ongkir\n& Voucher',
-        'icon': Icons.local_shipping,
-        'color': Colors.green[100],
-        'iconColor': Colors.green,
-      },
-      {
-        'title': 'ShopeePay\nSekitarmu',
-        'icon': Icons.account_balance_wallet,
-        'color': Colors.blue[100],
-        'iconColor': Colors.blue,
-      },
-      {
-        'title': 'Shopee\nFood',
-        'icon': Icons.fastfood,
-        'color': Colors.orange[100],
-        'iconColor': Colors.orange,
-      },
-      {
-        'title': 'Shopee\nMall',
-        'icon': Icons.storefront,
-        'color': Colors.red[100],
-        'iconColor': Colors.red,
-      },
-      {
-        'title': 'Pulsa, Tagihan\n& Tiket',
-        'icon': Icons.phone_android,
-        'color': Colors.cyan[100],
-        'iconColor': Colors.cyan,
-      },
-      {
-        'title': 'InFashion',
-        'icon': Icons.checkroom,
-        'color': Colors.pink[100],
-        'iconColor': Colors.pink,
-      },
-      {
-        'title': 'Shopee\nSupermarket',
-        'icon': Icons.shopping_basket,
-        'color': Colors.green[100],
-        'iconColor': Colors.green[700],
-      },
-      {
-        'title': 'Bayar Di\nTempat',
-        'icon': Icons.money,
-        'color': Colors.teal[100],
-        'iconColor': Colors.teal,
-      },
+      {'title': 'Gratis Ongkir\n& Voucher', 'icon': Icons.local_shipping, 'color': Colors.green[100], 'iconColor': Colors.green},
+      {'title': 'Shopee Video', 'icon': Icons.play_circle_fill, 'color': Colors.orange[100], 'iconColor': Colors.orange},
+      {'title': 'Shopee Live', 'icon': Icons.videocam, 'color': Colors.red[100], 'iconColor': Colors.red},
+      {'title': 'Shopee Mall', 'icon': Icons.storefront, 'color': Colors.red[50], 'iconColor': Colors.red[800]},
+      {'title': 'Pulsa & Tagihan', 'icon': Icons.phone_android, 'color': Colors.cyan[100], 'iconColor': Colors.cyan},
+      {'title': 'ShopeeFood', 'icon': Icons.fastfood, 'color': Colors.orange[100], 'iconColor': Colors.orange[800]},
+      {'title': 'Supermarket', 'icon': Icons.shopping_basket, 'color': Colors.green[100], 'iconColor': Colors.green[700]},
+      {'title': 'Shopee Barokah', 'icon': Icons.mosque, 'color': Colors.teal[100], 'iconColor': Colors.teal},
     ];
 
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Wrap(
         spacing: 12,
         runSpacing: 16,
@@ -244,14 +274,10 @@ class ShopeeHomePage extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(4),
-                      ),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
                     ),
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(4),
-                      ),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                       child: Image.asset(product['image'], fit: BoxFit.cover),
                     ),
                   ),
@@ -283,10 +309,7 @@ class ShopeeHomePage extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             '4.8 | Terjual ${product['sold']}',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey,
-                            ),
+                            style: const TextStyle(fontSize: 10, color: Colors.grey),
                           ),
                         ],
                       ),
